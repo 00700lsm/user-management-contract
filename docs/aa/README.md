@@ -13,6 +13,9 @@
 8. [미결정 사항/설계 결정](./decisions.md) — 개발 전 확인 항목
 9. [AA 인계·승인 체크리스트](./handoff-checklist.md)
 
+## 프로젝트 기술 스택 제안
+- [기술 스택 / H2 로컬 DB / 통합 개발 기준](./tech-stack-proposal.md) — **Proposed, AA 승인 전**. DEC-003/004/011 확인 필요
+
 ## 인증·Agent 개발 기준
 - [공통 인증·인가 설계](./auth-design.md) — Auth 분리 개발·Mock/Real 인터페이스 기준
 - [Mock Fixture](./mock-fixtures.md) — Guest/USER/ADMIN 등 공통 테스트 상태
