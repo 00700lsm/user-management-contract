@@ -1,0 +1,20 @@
+name: Validate shared OpenAPI
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate OpenAPI structure
+        run: npx --yes @apidevtools/swagger-cli@4.0.4 validate openapi.yaml
+      - name: Verify governance files
+        run: |
+          test -s docs/governance/git-workflow.md
+          test -s docs/contract-governance.md
