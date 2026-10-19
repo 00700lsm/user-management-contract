@@ -12,6 +12,8 @@
 | DEC-006 | Open | 관리자 사용자 생성 시 초기 비밀번호 전달·강제 변경 규칙 | User, Auth, 관리자 UI |
 | DEC-007 | Open | Password 정책 및 비밀번호 변경 오류 응답의 구체화 | Auth, 계약 |
 | DEC-008 | Open | 사용자 목록 Role 표시 여부. 현재 User 응답에 Role이 없어 추가 조회/계약 개정 필요 | User 화면, Permission API |
+| DEC-009 | Open | 인증 Principal의 userId/Role/상태 확인 방법, Role 변경 반영 시점, /auth/me 도입 여부 | Auth/User/Permission, FE Route Guard, OpenAPI |
+| DEC-010 | Open | 공통 FE Mock/Real Auth 경계, BE 테스트 인증 Fixture, 운영에서 Mock 비활성화 방식 | Frontend/Backend/CI |
 
 ## 결정 기록 양식
 
