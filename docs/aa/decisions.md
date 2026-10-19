@@ -1,36 +1,30 @@
-# AA 설계 결정 기록 (ADR-lite)
+# AA 설계 결정 기록 — PoC 기준선
 
-아래는 **정의되지 않은 사항**입니다. 개발자가 스스로 확정하거나 아래 제안을 확정된 구현 요구로 간주하지 않습니다. 담당자·AA/PL이 합의 후 해당 정본을 수정해야 합니다.
+**상태: 아래 11개 결정은 2026-10-20 PoC 진행 기준으로 Accepted.** 사용자 승인에 따라 추천안으로 확정했습니다. **문서 승인 ≠ 기능 구현·실제 테스트 완료**입니다. 상용 서비스/실제 개인정보 운영에는 별도 보안·법무 검토가 필요합니다.
 
-| ID | 상태 | 결정이 필요한 사항 | 영향 |
+| ID | 상태 | 확정한 PoC 기준 | 확인·검증/영향 |
 |---|---|---|---|
-| DEC-001 | Open | JWT 수명·갱신·브라우저 저장 및 로그아웃 토큰 무효화 방식 | Auth, FE App, 보안/테스트 |
-| DEC-002 | Open | 회원가입 시 User/Auth/Permission 생성 순서, 트랜잭션/보상·롤백 | User/Auth/Permission, DB |
-| DEC-003 | Open | Backend 물리 구성: 모듈형 단일 앱 vs 3개 서비스, DB 분리 여부, 내부 계약 | 아키텍처, 빌드/배포 |
-| DEC-004 | Open | React UI 라이브러리/디자인 토큰/공통 컴포넌트 책임 및 반응형 기준 | 전체 FE |
-| DEC-005 | Open | INACTIVE/WITHDRAWN 로그인 정책, 탈퇴 이력·개인정보 보존/마스킹, 재활성화 | Auth, User, UI |
-| DEC-006 | Open | 관리자 사용자 생성 시 초기 비밀번호 전달·강제 변경 규칙 | User, Auth, 관리자 UI |
-| DEC-007 | Open | Password 정책 및 비밀번호 변경 오류 응답의 구체화 | Auth, 계약 |
-| DEC-008 | Open | 사용자 목록 Role 표시 여부. 현재 User 응답에 Role이 없어 추가 조회/계약 개정 필요 | User 화면, Permission API |
-| DEC-009 | Open | 인증 Principal의 userId/Role/상태 확인 방법, Role 변경 반영 시점, /auth/me 도입 여부 | Auth/User/Permission, FE Route Guard, OpenAPI |
-| DEC-010 | Open | 공통 FE Mock/Real Auth 경계, BE 테스트 인증 Fixture, 운영에서 Mock 비활성화 방식 | Frontend/Backend/CI |
-| DEC-011 | Open | PoC 로컬 DB(H2 파일/테스트 메모리), Flyway 마이그레이션·Seed·배포 DB 정책 | Backend/테스트/통합 |
+| DEC-001 | Accepted | Bearer JWT Access Token 15분; Refresh Token 없음; FE는 `sessionStorage`에 보관(새 탭/브라우저 종료 시 재로그인), 401 시 삭제·로그인 이동; Logout 시 Token `jti`를 만료까지 서버 측 폐기 목록에 추가 | 실제 Logout 폐기 목록·JWT 서명/검증 구현 필요. `sessionStorage`는 XSS에 노출될 수 있어 CSP/입력보안 검토 |
+| DEC-002 | Accepted | 모듈형 단일 Backend/단일 H2 DB에서 User 가입 + Auth 자격증명 + Permission 기본 USER를 서비스 간 협업 및 **단일 트랜잭션**으로 처리; 모든 단계 실패 시 Rollback | REQ-USER-001, 가입 오류/재시도 테스트 |
+| DEC-003 | Accepted | **하나의 Spring Boot 실행 앱**, Auth/User/Permission 논리 모듈 3개 + 한 개 DB; 3개 물리 서비스/Microservices는 PoC 범위 제외 | 모듈 데이터 Owner/호출 경계 유지 |
+| DEC-004 | Accepted | React + TypeScript + Vite, React Router, TanStack Query, **CSS Modules + Frontend `design.md` 토큰**, 공통 Shared UI; 이번 단계에서 무거운 UI 라이브러리 추가하지 않음 | UI/IA는 Contract, 상세 비주얼은 Frontend design.md |
+| DEC-005 | Accepted | `ACTIVE` 사용자만 로그인 및 보호 API 접근 가능; `INACTIVE`/ `WITHDRAWN`은 접근 차단; INACTIVE→ACTIVE는 관리자 상태 변경으로 복구 가능; WITHDRAWN은 PoC에서 되돌리지 않음/물리삭제 하지 않음 | 현재 세션 중 상태 변경도 보호 API에서 재검증. 실제 개인정보 보존·파기 규정은 PoC 외 |
+| DEC-006 | Accepted | 관리자의 사용자 등록은 기존 SignupRequest의 명시적 `password`를 사용. 자동 임시 비밀번호·비밀번호 이메일 발송 기능 없음; 관리자에게 입력값 재표시/로그 출력 금지, 별도 안전 채널로 전달 | 초기 비밀번호 강제 변경 UX·API 추가는 PoC 범위 제외 |
+| DEC-007 | Accepted | 비밀번호 길이 최소 12글자, UTF-8 인코딩 최대 72바이트(Bcrypt 절단 방지), 확인 정책은 FE 안내/BE 검증; BCrypt 단방향 해시, 원문 저장/로그 금지 | 기존 OpenAPI의 password 최소값·오류코드는 계약 PR로 향후 보강 가능 |
+| DEC-008 | Accepted | 사용자 **목록에는 Role 컬럼을 표시하지 않음**. 관리자 상세→`/admin/users/:id/roles` 이동 후 Permission API 조회 | 현재 User 응답 Schema 그대로 |
+| DEC-009 | Accepted | JWT `sub`=문자열 표현 User ID, `roles`=Role 코드 배열(UI 표시용). Backend는 JWT 서명/만료/`jti` 검증 후 **DB에서 상태·현재 Role을 재조회**하여 인가; Role 변경 다음 보호 API 호출부터 반영. 403 후 FE는 권한 UI 갱신/재로그인 안내 | `GET /auth/me` 추가하지 않음. 브라우저 JWT Payload만 보고 권한을 신뢰하지 않음 |
+| DEC-010 | Accepted | FE Mock Auth Adapter + MSW는 **development/test 전용**. BE Auth Fixture/격리 H2는 test Profile에만. CI/E2E의 실제 Auth 검증 필수; 운영에는 Mock/고정 테스트 비밀값/인증 우회 없음 | G1~G4 단계별 테스트 증거 |
+| DEC-011 | Accepted | 개발자별 **H2 Embedded File** 로컬 DB, 테스트별 H2 Memory DB; **Flyway SQL로 Schema/공통 테스트 Seed 재현**; 실제 DB 파일 Git 제외. PostgreSQL/공유 DB는 PoC 필수 아님 | schema migration·개발 프로필·CI 검증 |
 
-## 결정 기록 양식
+## 우선순위와 구현 전제
 
-```text
-ID:
-상태: Open / Accepted / Superseded
-결정일 / 승인자:
-문제/맥락:
-검토한 대안:
-최종 결정:
-영향 범위 (REQ / UI / DB / API / Test):
-관련 Contract/설계 PR:
-```
+1. 공통 요구사항·OpenAPI 정본은 `openapi.yaml`, 논리 ERD는 `docs/db-design.md`, FE 화면 IA는 `docs/ui-structure.md`입니다.
+2. Backend·Frontend의 `contract.sha`가 **같은 승인된 Git SHA**를 가리켜야 합니다. 새 API를 임의 도입하지 않습니다.
+3. 구현 시작 단계: Spring Boot + H2/Flyway Skeleton, React/Vite/Router/Query/CSS token Skeleton, 개발 전용 Mock·보안 Test Fixture 기반.
+4. 도메인별 실제 구현 A(Auth), B(User), C(Permission)은 별도 요구사항/PR 테스트로 완료를 증빙합니다.
+5. 로그아웃/Role 변경/가입 데이터 정합성은 문서 확정만으로 동작하지 않습니다. 해당 구현 및 G3/G4를 통과해야 완료입니다.
+6. 별도 상용 요구로 발생할 수 있는 사항: 운영 DB(PostgreSQL), 실제 개인정보 보호·보존·파기, 토큰 쿠키 기반 저장/CSP 강화, 운영 접근 기록, Secret 회전, CI 보안 심사.
 
-**계약에 영향을 주는 결정은** 결정만 기록해서 끝내지 않고 `openapi.yaml` 변경 PR → 승인 → FE/BE `contract.sha` 업데이트까지 이어져야 합니다.
+## 변경 프로세스
 
-## 기술 스택 제안 (승인 전)
-
-[PoC 기술 스택 제안서](./tech-stack-proposal.md): **Java 21 + Spring Boot 4.1.x, 단일 모듈형 Backend, Spring Data JPA(Hibernate) + H2 File 로컬/H2 Memory 테스트 + Flyway, React + TypeScript + Vite + CSS Modules + MSW**. 이는 DEC-003/004/011에 대한 제안이지 **Accepted 결정이 아닙니다**. Auth/가입/DB/운영 관련 다른 Open 항목도 계속 남아 있습니다.
+정책 변경은 AA/PL+관련 FE/BE 담당자의 리뷰를 받는 Contract 설계 PR로 수정합니다. API 요청·응답·HTTP 상태/경로를 변경하는 경우 `openapi.yaml` Contract PR을 먼저 승인하고, 해당 SHA를 FE/BE에 반영합니다. 이 문서의 Accepted 결정은 구현팀의 무제한 변경 권한이 아닙니다.
