@@ -16,6 +16,12 @@
 - [ ] C Permission: Role/권한 모델, ADMIN 접근 제한
 - [ ] 개발자들이 코드 내부 구현 세부사항은 자율적으로 설계하되 공통 계약은 준수한다고 합의
 
+## 인증 기반 독립 개발 / 통합 인계
+- [ ] [공통 Auth 설계](./auth-design.md)에서 Principal/Role 확인 정책의 미결정 사항 식별
+- [ ] [Mock Fixture](./mock-fixtures.md)를 FE/BE가 동일 시나리오로 사용하기로 합의
+- [ ] [독립→통합 Test Plan](./integration-test-plan.md)의 G1~G4 및 TC-INT 항목 담당/환경 확인
+- [ ] 운영 환경에서 Mock 인증·Test Secret 비활성 확인
+
 ## 개발 / 통합의 완료 조건
 - [ ] 각 FE/BE PR에 REQ/UI ID 및 Contract SHA 기재
 - [ ] OpenAPI 유효성·타입 생성 및 실행 중인 서버 계약 테스트 증빙
