@@ -1,0 +1,49 @@
+{
+  "folders": [
+    {
+      "name": "Contract",
+      "path": "."
+    },
+    {
+      "name": "Backend",
+      "path": "../user-management-backend"
+    },
+    {
+      "name": "Frontend",
+      "path": "../user-management-frontend"
+    }
+  ],
+  "settings": {
+    "git.autofetch": true
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Workspace: sync all repositories (safe fast-forward)",
+        "type": "shell",
+        "command": "bash \"${workspaceFolder:Contract}/scripts/workspace/sync.sh\"",
+        "options": {
+          "cwd": "${workspaceFolder:Contract}"
+        },
+        "runOptions": {
+          "runOn": "folderOpen"
+        },
+        "presentation": {
+          "reveal": "silent",
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Workspace: initialize missing repositories",
+        "type": "shell",
+        "command": "bash \"${workspaceFolder:Contract}/scripts/workspace/bootstrap.sh\"",
+        "options": {
+          "cwd": "${workspaceFolder:Contract}"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+}
