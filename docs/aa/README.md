@@ -14,10 +14,10 @@
 9. [AA 인계·승인 체크리스트](./handoff-checklist.md)
 
 ## 인증·Agent 개발 기준
-- [공통 인증·인가/Mock 설계](./auth-design.md) — A/B/C 간 Auth 연결 기준
-- [Mock 계정·상태 Fixture](./mock-fixtures.md) — Guest/USER/ADMIN/만료/비활성
-- [독립→실제 통합/E2E 검증 계획](./integration-test-plan.md) — G1~G4 게이트 및 TC-INT ID
-- [Agent Skill 작성/운영 가이드](../governance/agent-skills-guide.md), [공통 Contract-first Skill](../../.agents/skills/contract-first/SKILL.md)
+- [공통 인증·인가 설계](./auth-design.md) — Auth 분리 개발·Mock/Real 인터페이스 기준
+- [Mock Fixture](./mock-fixtures.md) — Guest/USER/ADMIN 등 공통 테스트 상태
+- [인증 기반 통합 테스트](./integration-test-plan.md) — G1~G4 단계와 TC-INT 테스트
+- [Agent Skill 작성 가이드](../governance/agent-skills-guide.md) 및 [Contract-first Skill](../../.agents/skills/contract-first/SKILL.md)
 
 ## 실제 구현 저장소에서 참고할 자료
 - [Backend AA 인계](https://github.com/00700lsm/user-management-backend/blob/dev/docs/aa/README.md)

@@ -1,49 +1,39 @@
-# FE·BE 인증 연동 / E2E 검증 계획 (AA Draft)
+# 인증 기반 병렬 개발·통합 테스트 계획 (Draft)
 
-테스트 ID는 **계획 식별자**이며 실제 실행 증거가 아닙니다. 대상 빌드는 동일하게 승인된 `Contract SHA`를 사용합니다.
+테스트 ID는 계획일 뿐 실행 완료 증거가 아닙니다. FE와 BE의 `contract.sha`가 동일한 승인 OpenAPI를 가리켜야 합니다.
 
-## 단계별 게이트
-
-| 단계 | 개발 독립성 | 실행 방법 | 통과 조건 |
-|---|---|---|---|
-| G1 Mock UI | A 미구현이어도 B/C 화면 개발 가능 | Auth 상태/HTTP 응답 Mock(예: MSW) | Guest/USER/ADMIN·로딩/실패·보호 Route |
-| G2 BE 단위/Contract | 서비스 런타임 연계 없이 각 도메인 테스트 | 격리 DB와 Test-only 인증 fixture, 명세 응답 검증 | 200·201·204 및 401·403·409 등 계약상 사례 |
-| G3 실제 Auth 연결 | Auth/BE 통합 환경 필요 | A 로그인 결과를 B/C 요청에 사용 | 토큰 검증, 현재 User/Role, 계정 상태 일치 |
-| G4 통합 E2E | FE+BE+데이터 준비 완료 | 브라우저 E2E(예: Playwright) | 사용자 흐름/권한/데이터 일관성, Mock 완전 비활성 |
-
-## 최소 테스트 매트릭스
-
-| TC ID | 행위 | 기대 |
+| 게이트 | 환경 | 합격 조건 |
 |---|---|---|
-| TC-INT-001 | Guest가 /me 접근 | Login 이동(화면), API 미인증 401 |
-| TC-INT-002 | USER 로그인 → /me | 200 및 본인 정보; 다른 사용자 정보 임의 노출 금지 |
-| TC-INT-003 | USER가 관리자 사용자·권한 API 호출 | 403 및 화면 접근 차단 |
-| TC-INT-004 | ADMIN 로그인 → 사용자 목록/상세 | 정상 검색·페이징·상세 |
-| TC-INT-005 | ADMIN이 USER Role 변경 | 재조회 일치; 현재 세션 반영 시점은 승인 정책대로 |
-| TC-INT-006 | Guest 회원가입 → 신규 계정 로그인 | User·Auth·Permission 생성 정합성 |
-| TC-INT-007 | 만료/변조/누락 Token | 401, Refresh/재로그인 UX는 승인 정책대로 |
-| TC-INT-008 | 로그아웃 후 보호 API 재접근 | DEC-001 승인 정책에 따라 유효성/재접근 검증 |
-| TC-INT-009 | INACTIVE / WITHDRAWN 사용자 로그인·보호 API | DEC-005 승인 정책에 따른 허용/차단 |
-| TC-INT-010 | 가입/권한 할당 중간 실패 유발 | DEC-002 승인 정책에 따라 롤백/보상·중복 생성 방지 |
-| TC-INT-011 | FE와 BE 계약 SHA 다름 | 릴리스/통합 검사 실패, 버전 차이 명시 |
-| TC-INT-012 | 운영 모드에서 Mock Auth 사용 시도 | Mock Adapter·Test secret·테스트 UI 진입 불가 |
+| G1 FE Mock | Auth 미완성 상태의 화면 개발 | Guest/USER/ADMIN, 보호 Route, 401/403 UX |
+| G2 BE 격리/계약 | 격리 DB·테스트 인증 Fixture | 명세 Body/Status, 인증·권한 검증 |
+| G3 Real Auth | A가 발급한 실제 Token으로 B/C API 호출 | 사용자·Role·계정 상태 일관성 |
+| G4 E2E | 통합 FE+BE, Mock 비활성 | 가입→로그인→내 정보/관리자 업무 전체 연결 |
 
-## 실행 시 필수 준비
-- 동일 `Contract SHA`를 명시한 FE/BE Commit, 서버 실행 URL 및 테스트 대상 환경 기록
-- Fixture: guest/user/admin/expired/inactive/withdrawn (자세한 값은 [Mock Fixture](./mock-fixtures.md))
-- 격리 테스트 DB, 비밀값은 CI Secrets/런타임 환경변수. 실제 개인정보/운영 토큰 재사용 금지
-- API 응답 Schemas 외에 실제 권한·세션 수명·User 상태/Role 정합성 검증
-- 브라우저 테스트는 UI Route부터 시작하되 401/403 Backend API 결과도 함께 확인
+## 통합 시나리오
 
-## 증거 남기는 형식
+| 테스트 ID | 시나리오 |
+|---|---|
+| TC-INT-001 | Guest /me 접근 → 로그인 안내, API 401 |
+| TC-INT-002 | USER 로그인 → 본인 정보 정상 조회 |
+| TC-INT-003 | USER 관리자 화면/API 접근 → 차단 및 Backend 403 |
+| TC-INT-004 | ADMIN 사용자 목록·상세·검색·페이징 |
+| TC-INT-005 | ADMIN 사용자 Role 변경 후 재조회, 정책에 따른 세션 반영 |
+| TC-INT-006 | 회원가입→로그인, User/Auth/Permission 데이터 정합성 |
+| TC-INT-007 | 토큰 누락·만료·변조 → 401 |
+| TC-INT-008 | 로그아웃 후 접근: 승인된 토큰 무효화 정책대로 |
+| TC-INT-009 | 비활성/탈퇴 사용자: 승인된 계정 정책대로 |
+| TC-INT-010 | 가입 과정 실패 시 롤백/보상 정합성 |
+| TC-INT-011 | FE/BE 계약 버전 불일치 → 통합 검증 실패 |
+| TC-INT-012 | 운영 빌드에 Mock Auth·테스트 비밀값 진입 불가 |
+
+## 테스트 증거 형식
 ```text
-TC ID:
-시나리오 / 성공·실패:
-환경 및 FE SHA / BE SHA / Contract SHA:
-사용 Fixture (비밀값 제외):
+TC ID / 담당:
+FE SHA, BE SHA, Contract SHA:
+실행 환경, Fixture ID (비밀값 제외):
 실행 명령 및 결과:
-PR / 테스트 결과 링크:
-해결되지 않은 불일치와 DEC 번호:
+CI/E2E 로그·관련 PR:
+미결정 사항과 차단 요인:
 ```
 
-G1이나 타입 생성만으로 통합 완료로 표시하지 않습니다. 서버 런타임, Mock 환경, E2E 도구는 기술 스택 확정 후 실제 코드와 CI에 연결합니다.
+OpenAPI 구문 검증과 TypeScript 타입 생성 성공만으로 실제 서버 계약 준수나 E2E 완료를 주장하지 않습니다.
