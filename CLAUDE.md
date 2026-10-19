@@ -1,3 +1,3 @@
 # Claude Code — Contract
 
-Read `AGENTS.md` and, for contract-based decisions, `.agents/skills/contract-first/SKILL.md`. This is the shared authoritative Contract repository. Do not invent endpoints, Auth claims or settled policy. Cross-repo skills are documented in `docs/governance/agent-skills-guide.md`.
+Read `AGENTS.md`, `.agents/skills/contract-first/SKILL.md`, and `docs/governance/agent-skills-guide.md`. This repository contains the shared AA design and API contract. Verify unresolved decisions before changing interfaces.
