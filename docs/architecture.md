@@ -48,3 +48,7 @@ flowchart TB
 - C: Permission Backend + Permission Frontend
 
 이 PoC의 목적은 교차 배정이 아니라 **같은 담당자가 구현하더라도 공통 계약과 설계 경계를 지키며 통합 가능한지 검증**하는 것입니다.
+
+## PoC 구현 형태 제안 (확정 전)
+
+[AA 기술 스택 제안](./aa/tech-stack-proposal.md)에서는 공용 DB 서버가 없는 3인 실험을 위해 **하나의 Spring Boot 실행 앱(논리 Auth/User/Permission 모듈) + 개발자별 H2 Embedded File DB + 단일 React App**을 추천합니다. 모듈은 독립 서비스라는 뜻이 아니며, 데이터 소유 경계와 외부 OpenAPI는 기존 정본을 유지합니다. 실제 채택 여부는 DEC-003/011 승인 후 확정합니다.

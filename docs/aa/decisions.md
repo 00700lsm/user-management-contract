@@ -14,6 +14,7 @@
 | DEC-008 | Open | 사용자 목록 Role 표시 여부. 현재 User 응답에 Role이 없어 추가 조회/계약 개정 필요 | User 화면, Permission API |
 | DEC-009 | Open | 인증 Principal의 userId/Role/상태 확인 방법, Role 변경 반영 시점, /auth/me 도입 여부 | Auth/User/Permission, FE Route Guard, OpenAPI |
 | DEC-010 | Open | 공통 FE Mock/Real Auth 경계, BE 테스트 인증 Fixture, 운영에서 Mock 비활성화 방식 | Frontend/Backend/CI |
+| DEC-011 | Open | PoC 로컬 DB(H2 파일/테스트 메모리), Flyway 마이그레이션·Seed·배포 DB 정책 | Backend/테스트/통합 |
 
 ## 결정 기록 양식
 
@@ -29,3 +30,7 @@ ID:
 ```
 
 **계약에 영향을 주는 결정은** 결정만 기록해서 끝내지 않고 `openapi.yaml` 변경 PR → 승인 → FE/BE `contract.sha` 업데이트까지 이어져야 합니다.
+
+## 기술 스택 제안 (승인 전)
+
+[PoC 기술 스택 제안서](./tech-stack-proposal.md): **Java 21 + Spring Boot 4.1.x, 단일 모듈형 Backend, Spring Data JPA(Hibernate) + H2 File 로컬/H2 Memory 테스트 + Flyway, React + TypeScript + Vite + CSS Modules + MSW**. 이는 DEC-003/004/011에 대한 제안이지 **Accepted 결정이 아닙니다**. Auth/가입/DB/운영 관련 다른 Open 항목도 계속 남아 있습니다.
