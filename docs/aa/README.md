@@ -33,3 +33,9 @@
 - 계약 변경은 [공통 승인 절차](../contract-governance.md)에 따라 **Contract PR 선반영**, FE/BE `contract.sha`는 승인된 SHA로 함께 업데이트.
 - OpenAPI의 필드/엔드포인트는 다른 문서의 설명이나 예시보다 우선합니다. 설계 문서 간 충돌은 AA/PL이 기준 문서 수정 PR로 해결합니다.
 - 이 패키지는 구현 완료 보고서가 아니라 **AA 개발 착수 기준선 초안**입니다.
+
+## AA 설계 검증용 Skill
+
+- [API 계약 검증](../../.agents/skills/validate-api-contract/SKILL.md) — Schema 및 FE/BE Contract SHA
+- [계약 변경 영향 분석](../../.agents/skills/review-contract-change/SKILL.md) — 호환성·담당자·테스트
+- [요구사항 커버리지 점검](../../.agents/skills/check-requirement-coverage/SKILL.md) — REQ/UI/API/DB/TC 누락 검사

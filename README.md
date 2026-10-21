@@ -27,3 +27,15 @@ Frontend와 Backend는 **같은 담당자가 같은 도메인을 수직 개발**
 ## AA 개발 인계 패키지
 
 개발 착수 전에 [AA 설계 인계 목차](docs/aa/README.md)를 확인합니다. 기능 상세, 요구사항 추적표, 설계 미결정 사항, 인계 체크리스트가 있습니다. **이 저장소가 AA 설계의 정본**입니다.
+
+## 실행형 Contract Skills
+
+- [`validate-api-contract`](.agents/skills/validate-api-contract/SKILL.md) — OpenAPI 유효성 및 FE/BE 승인 Contract SHA 일치·존재 여부 검증
+- [`review-contract-change`](.agents/skills/review-contract-change/SKILL.md) — 기준/변경안 비교, Breaking Change 후보와 FE/BE·테스트 영향 분석
+- [`check-requirement-coverage`](.agents/skills/check-requirement-coverage/SKILL.md) — REQ→UI→API→DB Owner→TC 추적표의 누락·불일치 검사
+
+모든 Skill은 요청 시 읽기 전용으로 실행하며, 사용자 명시 요청 없이 Git/문서/계약 SHA를 변경하지 않습니다. Claude Code용 동일 이름 어댑터는 `.claude/skills/`에 있습니다. 공통 설계 준수는 Skill이 아니라 `AGENTS.md`의 상시 규칙입니다.
+
+### 로컬 검사 명령
+
+Contract 루트에서 `python3 scripts/validate_contract_pins.py`와 `python3 scripts/check_requirement_coverage.py`를 실행할 수 있습니다. OpenAPI 구조 검증은 기존 GitHub Actions(`.github/workflows/validate-openapi.yml`)를 사용하거나, 이미 설치된 CLI가 있다면 `npx --no-install @apidevtools/swagger-cli validate openapi.yaml`을 실행합니다. Python 검사는 표준 라이브러리만 사용합니다. 일부 로컬 Repository/도구가 없으면 미검증 경고를 별도로 확인해야 합니다.
