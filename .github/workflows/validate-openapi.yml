@@ -14,7 +14,14 @@ jobs:
           node-version: '22'
       - name: Validate OpenAPI structure
         run: npx --yes @apidevtools/swagger-cli@4.0.4 validate openapi.yaml
+      - name: Check requirement traceability
+        run: python3 scripts/check_requirement_coverage.py
+      - name: Check contract pins (warn on missing siblings in isolated CI)
+        run: python3 scripts/validate_contract_pins.py
       - name: Verify governance files
         run: |
           test -s docs/governance/git-workflow.md
           test -s docs/contract-governance.md
+          test -s .agents/skills/validate-api-contract/SKILL.md
+          test -s .agents/skills/review-contract-change/SKILL.md
+          test -s .agents/skills/check-requirement-coverage/SKILL.md
