@@ -12,6 +12,7 @@ This repository is the authoritative source of shared requirements, AA design, l
 - Distinguish design acceptance, structural checks, runtime implementation, and actual CI/E2E evidence.
 
 ## Explicit callable Skills
+- `.agents/skills/run-aa-checks/SKILL.md` — existing Python AA checks (coverage, pins, strict G0)
 - `.agents/skills/validate-api-contract/SKILL.md` — API structure/pin checks
 - `.agents/skills/review-contract-change/SKILL.md` — read-only compatibility/impact review
 - `.agents/skills/check-requirement-coverage/SKILL.md` — REQ/UI/API/DB/TC mapping audit
