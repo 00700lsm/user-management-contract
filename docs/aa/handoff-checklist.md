@@ -7,7 +7,7 @@
 - [ ] 전체 화면 IA, UI ID, 역할, 화면 이동 확인 — [화면](../ui-structure.md)
 - [ ] 공통 UI 컴포넌트와 인터랙션 정책 확인 — [UI 규칙](../ui-guidelines.md)
 - [ ] FE↔BE OpenAPI v0.1 계약 검토 — [OpenAPI](../../openapi.yaml)
-- [ ] 미결정 항목 중 해당 기능의 구현 착수 차단 항목을 해결하거나 범위를 제외하기로 합의 — [결정사항](./decisions.md)
+- [ ] DEC-001~011 Accepted 설계 준수 및 새로운 미결정/범위 밖 항목 식별 — [결정사항](./decisions.md)
 - [ ] Contract Repository의 승인 커밋 SHA를 지정하고 FE/BE `contract.sha`의 일치 확인
 
 ## 각 도메인 담당자 인수 확인

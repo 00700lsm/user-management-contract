@@ -1,6 +1,6 @@
-# 요구사항 기준선 (AA 초안)
+# 요구사항 기준선 (PoC)
 
-상태: Draft — 팀 합의 후 Baseline으로 전환합니다.
+상태: 기능 범위는 PoC 설계 기준이며 DEC-001~011은 [Accepted](./aa/decisions.md)입니다. 실제 구현과 테스트 완료 여부는 별개입니다.
 
 | ID | 도메인 | 기능 / 완료 조건 |
 |---|---|---|
@@ -22,11 +22,12 @@
 4. BE 테스트 + FE 주요 흐름 테스트 + FE/BE 통합 테스트 근거가 남는다.
 5. 변경은 관련 Requirement ID와 Contract SHA를 PR에 기록한다.
 
-## 보류·결정 필요
-- Access Token의 만료/갱신/저장 정책 및 로그아웃 무효화 방식
-- 회원가입 시 User ↔ Auth ↔ Permission 내부 협업 형태와 트랜잭션/실패 보상
-- 실제 물리 서비스/DB 분리 범위 (PoC는 논리 경계 우선)
-- 비밀번호 정책, 계정잠금, 관리자의 초기 비밀번호 발급 정책
-- 회원탈퇴를 본인도 수행할지 여부 (현재 API는 관리자 상태 변경만 정의)
+## 확정된 PoC 설계와 범위 밖 항목
+- JWT 15분/Refresh 없음/sessionStorage 및 로그아웃 시 JTI 폐기: DEC-001.
+- 회원가입 User/Auth/Permission 데이터 생성은 단일 DB 트랜잭션: DEC-002.
+- 단일 Spring Boot 실행 앱 및 로컬 H2/Flyway: DEC-003/011.
+- 비밀번호 최소 12글자·UTF-8 최대 72바이트 및 BCrypt: DEC-007. 관리자 등록 시 명시적인 초기 비밀번호: DEC-006.
+- ACTIVE 사용자만 접근 가능하며 WITHDRAWN 복구는 PoC에서 제외: DEC-005.
+- 별도 계정 잠금 정책·셀프 탈퇴 API·실제 개인정보 보존/파기 정책은 **PoC에 정의되지 않았습니다**. 필요한 경우 별도 요구와 Contract PR을 통해 합의합니다.
 
-미정 항목은 개발자가 임의로 확정하지 않고 변경제안/결정 기록으로 확정합니다.
+주의: Accepted 정책이 `openapi.yaml`의 세부 Schema 검증 항목에 아직 모두 인코딩됐다는 뜻은 아닙니다. 실제 계약 변경은 선행 Contract PR에서 승인해야 합니다.
