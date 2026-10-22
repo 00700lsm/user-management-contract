@@ -4,6 +4,7 @@
 
 | 게이트 | 환경 | 합격 조건 |
 |---|---|---|
+| G0 FE/BE/Contract 버전 기준선 | 실제 3개 Git checkout + 양쪽 `contract.sha` | **엄격한 SHA 일치·pinned OpenAPI 존재**; [자동 검사](../governance/integration-gate.md), HTTP 검증은 별도 |
 | G1 FE Mock | Auth 미완성 상태의 화면 개발 | Guest/USER/ADMIN, 보호 Route, 401/403 UX |
 | G2 BE 격리/계약 | 격리 DB·테스트 인증 Fixture | 명세 Body/Status, 인증·권한 검증 |
 | G3 Real Auth | A가 발급한 실제 Token으로 B/C API 호출 | 사용자·Role·계정 상태 일관성 |
@@ -36,4 +37,4 @@ CI/E2E 로그·관련 PR:
 미결정 사항과 차단 요인:
 ```
 
-OpenAPI 구문 검증과 TypeScript 타입 생성 성공만으로 실제 서버 계약 준수나 E2E 완료를 주장하지 않습니다.
+G0의 PASS도 실행 API 계약이나 실제 Auth/E2E 성공을 의미하지 않습니다. OpenAPI 구문 검증과 TypeScript 타입 생성 성공만으로 실제 서버 계약 준수나 E2E 완료를 주장하지 않습니다.

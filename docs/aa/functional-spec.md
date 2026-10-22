@@ -1,4 +1,4 @@
-# 기능 상세 / 비즈니스 규칙 (AA 초안)
+# 기능 상세 / 비즈니스 규칙 (PoC 기준)
 
 요구사항 ID와 상태는 [requirements.md](../requirements.md), 네트워크 요청·응답·상태코드는 [openapi.yaml](../../openapi.yaml)을 정본으로 합니다.
 
@@ -15,20 +15,20 @@
 | 요구 ID | 동작 및 조건 | 결과 / 검증 |
 |---|---|---|
 | REQ-AUTH-001 | `loginId` + `password`로 로그인; 비정상 자격 증명 거부 | 성공 시 `accessToken`, `tokenType`; 실패 시 표준 API 오류 |
-| REQ-AUTH-002 | 로그인 상태에서 로그아웃 요청 | 계약상 성공 시 204. 로그아웃 후 토큰 무효화 방식은 **DEC-001 미결정** |
+| REQ-AUTH-002 | 로그인 상태에서 로그아웃 요청 | 성공 시 204. DEC-001에 따라 Access Token JTI를 만료까지 서버 폐기 목록에 등록 |
 | REQ-AUTH-003 | 현재 비밀번호 + 새 비밀번호를 제출 | 확인/검증 성공 시 204; 실패 시 400 등 계약 기반 |
 
-Auth는 USER 프로필을 직접 수정하지 않습니다. 비활성/탈퇴 계정의 인증 처리 정책은 DEC-001/DEC-005 결정 후 확정합니다.
+Auth는 USER 프로필을 직접 수정하지 않습니다. DEC-005에 따라 ACTIVE만 로그인/보호 API 접근을 허용하고 INACTIVE/WITHDRAWN은 차단합니다. 결정은 승인됐지만 JWT/인가 구현은 아직 완료되지 않았습니다.
 
 ## User — 개발자 B
 
 | 요구 ID | 동작 및 조건 | 결과 / 검증 |
 |---|---|---|
-| REQ-USER-001 | Guest 회원가입. `loginId`·이메일 중복 거부; 필수값 확인 | 201 + User 반환, 중복 409. Auth 자격증명 및 USER 권한 생성의 실패 정합성은 **DEC-002** |
+| REQ-USER-001 | Guest 회원가입. `loginId`·이메일 중복 거부; 필수값 확인 | 201 + User 반환, 중복 409. DEC-002: Auth 자격증명과 기본 USER 권한까지 단일 DB 트랜잭션, 실패 시 Rollback |
 | REQ-USER-002 | USER 본인 정보 조회/수정. 수정 허용 필드는 이름·이메일 | 200 + User 반환; ID/상태/Role 직접 변경 금지 |
 | REQ-USER-003 | ADMIN 사용자 목록. `keyword`는 이름 또는 이메일 OR 검색, 상태 필터 | `page` 0-based, `size` 기본 20, 최대 100; `UserPage.items/page/size/total` |
-| REQ-USER-004 | ADMIN 사용자 생성·상세 조회·이름/이메일 변경 | 201/200; 이메일 중복 및 관리자가 부여할 초기 비밀번호 정책은 **DEC-006** |
-| REQ-USER-005 | ADMIN 사용자 상태 변경 | `ACTIVE/INACTIVE/WITHDRAWN`, 200 + User. 이력/복구 가능성은 **DEC-005** |
+| REQ-USER-004 | ADMIN 사용자 생성·상세 조회·이름/이메일 변경 | 201/200; DEC-006에 따라 기존 SignupRequest의 명시적 초기 비밀번호를 입력, 자동 생성/이메일 발송 기능 없음 |
+| REQ-USER-005 | ADMIN 사용자 상태 변경 | `ACTIVE/INACTIVE/WITHDRAWN`, 200 + User. INACTIVE→ACTIVE 복구 가능, WITHDRAWN 복구 및 물리 삭제는 PoC 제외(DEC-005) |
 
 실제 응답 코드가 OpenAPI 초안에 정의되지 않은 예외는 개발자가 임의로 도입하지 말고 계약 변경 PR을 제출합니다.
 
@@ -41,11 +41,11 @@ Auth는 USER 프로필을 직접 수정하지 않습니다. 비활성/탈퇴 계
 
 Permission은 USER 프로필이나 계정 상태를 직접 수정하지 않습니다.
 
-## 교차 도메인 연결 — AA 협의 필요
-1. 회원가입(User)이 Auth 자격증명 생성과 Permission 기본 권한 부여를 호출하는 내부 협업 방식
-2. Auth가 User 상태/Permission Role을 확인하는 방법과 갱신 반영 시점
-3. 관리자 상세(User)에서 Permission 화면으로 이동할 때 사용자 ID/권한 정보 전달
-4. 물리 MSA일 경우 내부 API 계약·오류 복구·데이터 정합성
+## 교차 도메인 연결 — 확정된 원칙과 개발 구현 책임
+1. DEC-002/003: User 가입 시 Auth 자격증명과 Permission 기본 USER Role 부여를 **단일 Spring Boot 앱의 서비스 협업 및 단일 DB 트랜잭션**으로 처리합니다. 내부 Java 인터페이스 세부 설계는 담당자가 공동 검토합니다.
+2. DEC-005/009: 보호 API마다 Backend가 현재 User 상태·Permission Role을 DB에서 재검증합니다. JWT Role은 UI 표시용이며 인가의 단독 근거가 아닙니다.
+3. DEC-008: 사용자 상세에서 `/admin/users/:id/roles`로 이동하고 Permission API로 Role을 조회합니다. 사용자 목록에는 Role 컬럼을 넣지 않습니다.
+4. 물리 MSA와 분산 트랜잭션은 PoC 범위 밖입니다. 도입하려면 별도 AA/Contract 설계가 필요합니다.
 
 현재 `openapi.yaml`은 **외부 FE↔BE 계약**이며 서비스 간 내부 계약을 확정한 것은 아닙니다.
 
