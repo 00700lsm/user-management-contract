@@ -7,6 +7,38 @@
 - API 기준: [openapi.yaml](./openapi.yaml)
 - 변경 절차: [docs/contract-governance.md](./docs/contract-governance.md)
 
+## 전체 개발 프로세스
+
+이 프로젝트는 **AA가 계약과 공통 기준을 먼저 고정하고, 실제 개발자 3명이 각자 AI를 활용해 담당 도메인의 Frontend·Backend를 독립 구현**하는 PoC입니다. Workspace는 초기 Clone만 담당합니다.
+
+```mermaid
+flowchart TD
+    W["Workspace · 최초 Clone / 에디터 설정"] --> C["AA / PL · Contract 정본 확정"]
+    C --> A["개발자 A · Auth FE + BE"]
+    C --> B["개발자 B · User FE + BE"]
+    C --> P["개발자 C · Permission FE + BE"]
+    A --> R["각 소유 Repo의 기능 PR → dev · CI / 교차 리뷰"]
+    B --> R
+    P --> R
+    R --> D{"OpenAPI / 공통 설계 변경?"}
+    D -- "예" --> X["Contract PR 선승인 · contract.sha 동시 갱신"]
+    X --> R
+    D -- "아니오" --> G["통합 검증 · G0 기준선 / G1 Mock / G2~G4 실연동"]
+    G --> M["승인된 dev → main 릴리스"]
+```
+
+| 책임 | 정본 및 변경 저장소 | 담당 작업 |
+|---|---|---|
+| 초기 진입 | [Workspace](https://github.com/00700lsm/user-management-workspace) | Clone, 에디터 설정, 명시적 dev 동기화만 |
+| AA/PL | **Contract (이 저장소)** | 요구·아키텍처·DB 논리 모델·화면 IA·OpenAPI, 변경 승인 및 통합 게이트 |
+| A/B/C | [Backend](https://github.com/00700lsm/user-management-backend) · [Frontend](https://github.com/00700lsm/user-management-frontend) | Auth / User / Permission 각각 FE+BE 구현·테스트·PR |
+
+**개발자의 기본 루프:** Contract의 요구 ID와 승인 SHA 확인 → FE/BE 각자 기능 브랜치 → 구현·테스트 → 개별 PR/CI·타 담당자 리뷰 → `dev` 통합. 인터페이스 변경은 코드보다 Contract PR이 먼저입니다. G0 및 Mock(G1) 성공은 실제 API/JWT/E2E(G2~G4) 성공을 뜻하지 않습니다.
+
+- [AA 인계 및 완료 기준](docs/aa/README.md) · [개발자 인계 체크리스트](docs/aa/handoff-checklist.md)
+- [공통 Git/PR 규칙](docs/governance/git-workflow.md) · [통합 게이트](docs/governance/quality-gates.md)
+- [Backend 로컬 실행](https://github.com/00700lsm/user-management-backend#로컬-실행-및-확인) · [Frontend 로컬 실행](https://github.com/00700lsm/user-management-frontend#로컬-실행-및-확인)
+
 ## 담당 방식
 - 개발자 A: Auth Frontend + Auth Backend
 - 개발자 B: User Frontend + User Backend
