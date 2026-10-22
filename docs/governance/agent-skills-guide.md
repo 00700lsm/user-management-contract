@@ -36,9 +36,10 @@
 
 ## 실행형 Contract Skills
 
-- [`validate-api-contract`](.agents/skills/validate-api-contract/SKILL.md) — OpenAPI 유효성 및 FE/BE 승인 Contract SHA 일치·존재 여부 검증
-- [`review-contract-change`](.agents/skills/review-contract-change/SKILL.md) — 기준/변경안 비교, Breaking Change 후보와 FE/BE·테스트 영향 분석
-- [`check-requirement-coverage`](.agents/skills/check-requirement-coverage/SKILL.md) — REQ→UI→API→DB Owner→TC 추적표의 누락·불일치 검사
+- [`run-aa-checks`](../../.agents/skills/run-aa-checks/SKILL.md) — Contract Python 3종 검사 일괄 호출 (`/run-aa-checks`)
+- [`validate-api-contract`](../../.agents/skills/validate-api-contract/SKILL.md) — OpenAPI 유효성 및 FE/BE 승인 Contract SHA 일치·존재 여부 검증
+- [`review-contract-change`](../../.agents/skills/review-contract-change/SKILL.md) — 기준/변경안 비교, Breaking Change 후보와 FE/BE·테스트 영향 분석
+- [`check-requirement-coverage`](../../.agents/skills/check-requirement-coverage/SKILL.md) — REQ→UI→API→DB Owner→TC 추적표의 누락·불일치 검사
 
 모든 Skill은 요청 시 읽기 전용으로 실행하며, 사용자 명시 요청 없이 Git/문서/계약 SHA를 변경하지 않습니다. Claude Code용 동일 이름 어댑터는 `.claude/skills/`에 있습니다. 공통 설계 준수는 Skill이 아니라 `AGENTS.md`의 상시 규칙입니다.
 
