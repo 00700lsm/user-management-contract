@@ -1,0 +1,56 @@
+name: Cross-repository integration baseline (G0)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+  schedule:
+    - cron: '17 1 * * 1-5'
+
+permissions:
+  contents: read
+
+jobs:
+  cross-repo-baseline:
+    runs-on: ubuntu-latest
+    env:
+      INTEGRATION_REF: ${{ (github.event_name == 'pull_request' && github.base_ref) || (github.ref_name == 'main' && 'main' || 'dev') }}
+    steps:
+      - name: Checkout Contract (full history for pinned SHA proof)
+        uses: actions/checkout@v4
+        with:
+          path: contract
+          fetch-depth: 0
+      - name: Checkout Frontend integration branch
+        uses: actions/checkout@v4
+        with:
+          repository: 00700lsm/user-management-frontend
+          ref: ${{ env.INTEGRATION_REF }}
+          path: frontend
+          persist-credentials: false
+      - name: Checkout Backend integration branch
+        uses: actions/checkout@v4
+        with:
+          repository: 00700lsm/user-management-backend
+          ref: ${{ env.INTEGRATION_REF }}
+          path: backend
+          persist-credentials: false
+      - name: Record comparison branch
+        run: echo "FE/BE branch = $INTEGRATION_REF"
+      - name: Run G0 verifier unit tests (including deliberate mismatch)
+        run: python3 -m unittest discover -s contract/tests -p 'test_verify_integration_baseline.py' -v
+      - name: Verify actual FE/BE Contract baseline and write evidence
+        run: |
+          python3 contract/scripts/verify_integration_baseline.py \
+            --contract contract --frontend frontend --backend backend \
+            --report integration-evidence.json
+      - name: Upload immutable run evidence (G1-G4 are NOT_RUN here)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-repo-integration-baseline
+          path: integration-evidence.json
+          if-no-files-found: warn
+          retention-days: 30

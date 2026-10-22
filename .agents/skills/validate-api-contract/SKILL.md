@@ -17,13 +17,14 @@ Inputs: Contract Git root; optional Frontend/Backend local repository paths (by 
    npx --no-install @apidevtools/swagger-cli validate openapi.yaml
    ```
    If the tool is not installed, mark `WARN NOT_RUN`. Do **not** claim this check passed. The existing GitHub Actions `.github/workflows/validate-openapi.yml` can be used as independent CI evidence **only if that run's result was actually checked**.
-3. Run the checked-in standard-library script:
+3. **For the actual FE/BE integration baseline (G0), run the strict gate** with all 3 existing Git checkouts:
    ```bash
-   python3 scripts/validate_contract_pins.py
+   python3 scripts/verify_integration_baseline.py --report integration-evidence.json
    ```
-   Optional: `python3 scripts/validate_contract_pins.py --frontend /path/to/frontend --backend /path/to/backend`. It checks SHA format, equality, that local Contract Git has the pinned commit and `openapi.yaml` at that commit. It never fetches automatically.
-4. If `contract.sha` paths are absent, local Contract Git objects are missing, or an OpenAPI validator cannot execute, report `WARN/NOT_RUN` with the reason. A valid SHA string alone is **not** proof a commit exists on GitHub.
-5. Record working-branch/commit if available, pin SHA and check outputs. Never use moving Contract `dev` to silently replace pinned contracts.
+   With Workspace roots, pass `--contract`, `--frontend`, `--backend` paths as specified by `docs/governance/integration-gate.md`. It fails on missing repositories, invalid/mismatched pins, missing Contract commit and missing pinned OpenAPI. It records actual checkout commit SHAs and always marks G1-G4 `NOT_RUN`.
+4. For an **exploratory partial** check only, `python3 scripts/validate_contract_pins.py` may report missing checkouts as WARN and return success. **Never use that lenient exit code as G0 PASS evidence.**
+5. If `contract.sha` paths or local Contract Git objects are missing, the strict gate must FAIL; if the separate OpenAPI validator cannot execute, report it as `NOT_RUN`. A valid SHA string alone is **not** proof a commit exists on GitHub.
+6. Record working-branch/commit if available, pin SHA and check outputs. Never use moving Contract `dev` to silently replace pinned contracts.
 
 ## Output contract
 ```text
