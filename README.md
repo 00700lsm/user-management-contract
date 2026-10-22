@@ -38,4 +38,4 @@ Frontend와 Backend는 **같은 담당자가 같은 도메인을 수직 개발**
 
 ### 로컬 검사 명령
 
-Contract 루트에서 `python3 scripts/validate_contract_pins.py`와 `python3 scripts/check_requirement_coverage.py`를 실행할 수 있습니다. OpenAPI 구조 검증은 기존 GitHub Actions(`.github/workflows/validate-openapi.yml`)를 사용하거나, 이미 설치된 CLI가 있다면 `npx --no-install @apidevtools/swagger-cli validate openapi.yaml`을 실행합니다. Python 검사는 표준 라이브러리만 사용합니다. 일부 로컬 Repository/도구가 없으면 미검증 경고를 별도로 확인해야 합니다.
+세 Repository를 함께 Clone한 환경에서 **엄격한 교차 기준선 검사(G0)**: `python3 scripts/verify_integration_baseline.py --report integration-evidence.json` (자세한 내용: [통합 품질 게이트](docs/governance/integration-gate.md)). 부분 로컬 점검용으로 `python3 scripts/validate_contract_pins.py` (누락 Repository는 WARN), 요구사항 점검은 `python3 scripts/check_requirement_coverage.py`를 실행할 수 있습니다. OpenAPI 구조 검증은 기존 GitHub Actions(`.github/workflows/validate-openapi.yml`)를 사용하거나, 이미 설치된 CLI가 있다면 `npx --no-install @apidevtools/swagger-cli validate openapi.yaml`을 실행합니다. Python 검사는 표준 라이브러리만 사용합니다. 일부 로컬 Repository/도구가 없으면 미검증 경고를 별도로 확인해야 합니다.
