@@ -1,6 +1,6 @@
-# 인증·인가 공통 설계 (AA 초안)
+# 인증·인가 공통 설계 (Accepted PoC 기준)
 
-상태: Draft — 아래 미결정 정책은 AA/PL 승인 후 확정합니다. 외부 API의 요청·응답·경로는 `openapi.yaml`이 유일한 정본입니다.
+상태: DEC-001/002/005/007/009/010은 [Accepted](./decisions.md)입니다. 정책 승인과 실제 인증 구현·통합 테스트 완료는 구별합니다. 외부 API의 요청·응답·경로는 `openapi.yaml`이 유일한 정본입니다.
 
 ## 기존 OpenAPI가 정의한 것
 - `POST /auth/login`: 익명 허용; `accessToken`, `tokenType` 응답
@@ -16,13 +16,16 @@
 - Frontend: Auth 상태 공급자(인터페이스)로 로그인 여부·Role에 따른 화면 진입을 제어하되, **Backend 권한 검사의 대체 수단으로 사용하지 않음**
 - Backend: 모든 보호 API에서 공통 인증·권한 정책을 사용. 프론트가 임의로 전달한 사용자 ID/Role을 신뢰하지 않음
 
-## 인증 컨텍스트 합의 후보 (API/JWT Schema로 확정되지 않음)
-| 값 | 용도 | 결정 사항 |
+## 승인된 인증 컨텍스트 (DEC-001/005/009)
+| 값 | 용도 | 승인된 규칙 |
 |---|---|---|
-| userId | 현재 인증된 사용자 식별 | 토큰 claim/서버 조회/형식 |
-| roleCodes | USER/ADMIN 권한 | claim/Permission 조회/변경 후 반영 시점 |
-| accountStatus | ACTIVE/INACTIVE/WITHDRAWN | 인증·기존 세션 허용 범위 |
-| authenticated | FE Auth 상태 | 만료·갱신·재로그인 처리 |
+| JWT `sub` | 현재 사용자 식별 | User ID의 문자열 표현 |
+| JWT `roles` | USER/ADMIN UI 표시 참고 | Role 코드 배열; Backend는 **최신 DB Role을 재조회**하여 인가 |
+| accountStatus | ACTIVE/INACTIVE/WITHDRAWN | 매 보호 API에서 재확인; ACTIVE만 허용 |
+| FE `authenticated` | 화면 로그인 상태 | `sessionStorage` Access Token 15분, Refresh 없음, 401 시 제거 및 로그인 이동 |
+| JWT `jti` | 로그아웃 토큰 폐기 | Logout 시 남은 유효기간 동안 서버 측 폐기 목록 등록 |
+
+JWT는 승인된 정책이나 실제 발급·검증·폐기 코드의 구현 여부는 별도 테스트로 판정합니다.
 
 `GET /auth/me` 등의 신규 API를 도입하려면 Contract PR로 요청·응답·권한과 예외 응답까지 확정한 뒤 구현합니다.
 
