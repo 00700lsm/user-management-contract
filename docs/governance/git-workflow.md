@@ -1,6 +1,6 @@
 # 공통 형상관리·협업 운영 규칙 (v0.1)
 
-이 문서는 3개 Repository 전체의 **공통 협업 운영 정본**입니다. 각 코드 저장소에는 로컬 실행 안내/자동화만 둡니다.
+이 문서는 Contract, Backend, Frontend, Workspace 4개 Repository 전체의 **공통 협업 운영 정본**입니다. 각 코드 저장소에는 로컬 실행 안내/자동화만 둡니다.
 
 ## Repository 책임
 
@@ -25,7 +25,8 @@ user-management-workspace/
 
 ## 브랜치/커밋/PR
 
-- `main`: 안정/릴리스 기준선. `dev` 검증 후 PR 병합합니다. 직접 push 금지 권장.\n- `dev`: 팀 통합 개발 기준선. 신규 Clone은 `dev`로 체크아웃하며 기능 브랜치의 PR 대상입니다.
+- `main`: 안정/릴리스 기준선. `dev` 검증 후 PR 병합합니다. 직접 push 금지 권장.
+- `dev`: 팀 통합 개발 기준선. 신규 Clone은 `dev`로 체크아웃하며 기능 브랜치의 PR 대상입니다.
 - 작업 브랜치: `feat/auth-login`, `feat/user-list`, `fix/permission-role`, `docs/db-model`, `contract/user-search`.
 - 하나의 기능이라도 FE/BE 변경은 **각 Repository에서 별도 브랜치, 커밋, PR**을 발행합니다.
 - 같은 기능의 FE/BE 두 PR에는 상호 링크와 동일한 **Contract SHA**를 적습니다.
@@ -60,15 +61,14 @@ user-management-workspace/
 - 관련 기능 PR은 각 Repo에서 독립 Merge되므로 일시적 불일치가 생길 수 있습니다. 통합 배포/테스트 시 **호환되는 FE Commit + BE Commit + Contract SHA 세트**를 함께 기록해야 합니다.
 - Breaking Change라면 호환성 전략(병행 지원/동시 릴리스 등)을 승인 후 실행합니다. GitHub 저장소 세 개의 Merge는 원자적 작업이 아닙니다.
 
-## 실제 GitHub에서 따로 켜야 하는 설정
+## GitHub main/dev 보호 정책 (P0-03 승인안)
 
-각 Repository Settings > Branches / Rulesets (계정·플랜에서 지원하는 범위):
-- `main` Pull Request 필수, 최소 1명 승인, 직접 push 제한
-- 필수 status check를 각 Workflow 실행 후 지정
-- 대화 해결 후 Merge, 가능하면 squash merge
-- 각 담당자 GitHub collaborator 권한 부여
-
-현재 규칙 문서와 CI 정의만으로 위 보호 설정이 자동 적용되지는 않습니다.
+Contract/Backend/Frontend/Workspace 4개 저장소의 main 및 dev 브랜치에 다음 보호 정책을 적용합니다.
+- PR 필수, 다른 Write 권한 리뷰어의 승인 1명, 신규 코드 Push 시 기존 승인 무효화, 미해결 리뷰 대화가 있으면 병합 금지
+- 직접 Push 및 Force Push 금지, 보호 브랜치 삭제 금지, 각 저장소 필수 CI 통과
+- PR을 통해 정상 병합되어야 하므로 Restrict updates 옵션은 사용하지 않습니다.
+- 세부 설정 및 관리자 적용·검증 순서는 [보호 브랜치 롤아웃 안내](./branch-protection-rollout.md) 참조
+- 이 문서와 워크플로 변경만으로 GitHub Ruleset이 활성화되지는 않습니다. Admin Settings에서 별도 활성화해야 합니다.
 
 ## 명시적 dev 동기화
 
