@@ -62,6 +62,7 @@ Frontend와 Backend는 **같은 담당자가 같은 도메인을 수직 개발**
 
 ## 실행형 Contract Skills
 
+- [`run-aa-checks`](.agents/skills/run-aa-checks/SKILL.md) — 기존 Python 3종 검사(요구사항 추적·Contract pin 진단·엄격한 G0)를 일괄 실행. Claude Code에서는 `/run-aa-checks`로 호출
 - [`validate-api-contract`](.agents/skills/validate-api-contract/SKILL.md) — OpenAPI 유효성 및 FE/BE 승인 Contract SHA 일치·존재 여부 검증
 - [`review-contract-change`](.agents/skills/review-contract-change/SKILL.md) — 기준/변경안 비교, Breaking Change 후보와 FE/BE·테스트 영향 분석
 - [`check-requirement-coverage`](.agents/skills/check-requirement-coverage/SKILL.md) — REQ→UI→API→DB Owner→TC 추적표의 누락·불일치 검사
