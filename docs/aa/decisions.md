@@ -17,6 +17,7 @@
 | DEC-011 | Accepted | 개발자별 **H2 Embedded File** 로컬 DB, 테스트별 H2 Memory DB; **Flyway SQL로 Schema/공통 테스트 Seed 재현**; 실제 DB 파일 Git 제외. PostgreSQL/공유 DB는 PoC 필수 아님 | schema migration·개발 프로필·CI 검증 |
 | DEC-012 | Proposed | `ApiError.code` 표준값: `UNAUTHORIZED`(401), `FORBIDDEN`(403), `INVALID_CREDENTIALS`(401, 로그인 실패는 원인 구분 없이 단일 코드·문구 — 계정 상태 노출 방지), `INVALID_OLD_PASSWORD`(400), `PASSWORD_POLICY_VIOLATION`(400), `VALIDATION_FAILED`(400). 로그인 입력 누락도 `INVALID_CREDENTIALS` 401 | `openapi.yaml` `ApiError.code` 설명. FE는 `code`로 문구 매핑. 타 도메인 코드 추가는 별도 PR |
 | DEC-013 | Proposed | 비밀번호 변경 성공 시 **해당 사용자의 기존 Access Token 전체 무효화**(변경 요청 토큰 포함): Backend는 JWT `iat` < `password_updated_at`(초 단위 내림)이면 401. FE는 204 후 안내 → 세션 삭제 → 재로그인. 기존 비밀번호 불일치는 400 `INVALID_OLD_PASSWORD` | 추가 테이블 없음(보호 요청마다 하는 DB 재조회에 포함). 로그아웃 `jti` 폐기(DEC-001)와 별개 |
+| DEC-014 | Proposed | User 오류 응답: 로그인 ID 중복 409 `DUPLICATE_LOGIN_ID`, 이메일 중복 409 `DUPLICATE_EMAIL`(가입·관리자 등록·내 정보/관리자 수정 공통, 둘 다 중복이면 `DUPLICATE_LOGIN_ID` 우선); 대상 사용자 없음 404 `USER_NOT_FOUND`; WITHDRAWN 사용자의 상태 변경 409 `INVALID_STATUS_TRANSITION`; 현재와 같은 상태로의 변경은 200(변경 없음); 형식 오류·빈 수정 요청은 400 `VALIDATION_FAILED`(DEC-012 재사용). 문자열 길이는 V1 스키마와 동일(loginId 80, email 254, name 120) | 가입 중복 응답은 계정 존재 여부를 노출하지만 REQ-USER-001(중복 거부)상 불가피하며 로그인 실패 비노출(DEC-012)과 범위가 다름. FE는 `code`로 입력칸별 오류 표시 |
 
 ## 우선순위와 구현 전제
 
