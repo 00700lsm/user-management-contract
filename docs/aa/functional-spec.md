@@ -14,9 +14,9 @@
 
 | 요구 ID | 동작 및 조건 | 결과 / 검증 |
 |---|---|---|
-| REQ-AUTH-001 | `loginId` + `password`로 로그인; 비정상 자격 증명 거부 | 성공 시 `accessToken`, `tokenType`; 실패 시 표준 API 오류 |
+| REQ-AUTH-001 | `loginId` + `password`로 로그인; 비정상 자격 증명 거부 | 성공 시 `accessToken`, `tokenType`; 실패(자격증명 오류·INACTIVE/WITHDRAWN·입력 누락) 시 401 `INVALID_CREDENTIALS` 단일 응답(DEC-012) |
 | REQ-AUTH-002 | 로그인 상태에서 로그아웃 요청 | 성공 시 204. DEC-001에 따라 Access Token JTI를 만료까지 서버 폐기 목록에 등록 |
-| REQ-AUTH-003 | 현재 비밀번호 + 새 비밀번호를 제출 | 확인/검증 성공 시 204; 실패 시 400 등 계약 기반 |
+| REQ-AUTH-003 | 현재 비밀번호 + 새 비밀번호를 제출 | 성공 시 204 후 해당 사용자의 기존 토큰 전체 무효화(DEC-013); 기존 비밀번호 불일치 400 `INVALID_OLD_PASSWORD`, 정책 위반 400 `PASSWORD_POLICY_VIOLATION`(DEC-007/012) |
 
 Auth는 USER 프로필을 직접 수정하지 않습니다. DEC-005에 따라 ACTIVE만 로그인/보호 API 접근을 허용하고 INACTIVE/WITHDRAWN은 차단합니다. 결정은 승인됐지만 JWT/인가 구현은 아직 완료되지 않았습니다.
 
