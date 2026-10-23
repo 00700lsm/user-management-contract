@@ -1,6 +1,6 @@
 # AA 설계 결정 기록 — PoC 기준선
 
-**상태: 아래 11개 결정은 2026-10-20 PoC 진행 기준으로 Accepted.** 사용자 승인에 따라 추천안으로 확정했습니다. **문서 승인 ≠ 기능 구현·실제 테스트 완료**입니다. 상용 서비스/실제 개인정보 운영에는 별도 보안·법무 검토가 필요합니다.
+**상태: DEC-001~011은 2026-10-20, DEC-012~013은 2026-10-23 PoC 진행 기준으로 Accepted.** 사용자 승인에 따라 추천안으로 확정했습니다. **문서 승인 ≠ 기능 구현·실제 테스트 완료**입니다. 상용 서비스/실제 개인정보 운영에는 별도 보안·법무 검토가 필요합니다.
 
 | ID | 상태 | 확정한 PoC 기준 | 확인·검증/영향 |
 |---|---|---|---|
@@ -15,8 +15,8 @@
 | DEC-009 | Accepted | JWT `sub`=문자열 표현 User ID, `roles`=Role 코드 배열(UI 표시용). Backend는 JWT 서명/만료/`jti` 검증 후 **DB에서 상태·현재 Role을 재조회**하여 인가; Role 변경 다음 보호 API 호출부터 반영. 403 후 FE는 권한 UI 갱신/재로그인 안내 | `GET /auth/me` 추가하지 않음. 브라우저 JWT Payload만 보고 권한을 신뢰하지 않음 |
 | DEC-010 | Accepted | FE Mock Auth Adapter + MSW는 **development/test 전용**. BE Auth Fixture/격리 H2는 test Profile에만. CI/E2E의 실제 Auth 검증 필수; 운영에는 Mock/고정 테스트 비밀값/인증 우회 없음 | G1~G4 단계별 테스트 증거 |
 | DEC-011 | Accepted | 개발자별 **H2 Embedded File** 로컬 DB, 테스트별 H2 Memory DB; **Flyway SQL로 Schema/공통 테스트 Seed 재현**; 실제 DB 파일 Git 제외. PostgreSQL/공유 DB는 PoC 필수 아님 | schema migration·개발 프로필·CI 검증 |
-| DEC-012 | Proposed | `ApiError.code` 표준값: `UNAUTHORIZED`(401), `FORBIDDEN`(403), `INVALID_CREDENTIALS`(401, 로그인 실패는 원인 구분 없이 단일 코드·문구 — 계정 상태 노출 방지), `INVALID_OLD_PASSWORD`(400), `PASSWORD_POLICY_VIOLATION`(400), `VALIDATION_FAILED`(400). 로그인 입력 누락도 `INVALID_CREDENTIALS` 401 | `openapi.yaml` `ApiError.code` 설명. FE는 `code`로 문구 매핑. 타 도메인 코드 추가는 별도 PR |
-| DEC-013 | Proposed | 비밀번호 변경 성공 시 **해당 사용자의 기존 Access Token 전체 무효화**(변경 요청 토큰 포함): Backend는 JWT `iat` < `password_updated_at`(초 단위 내림)이면 401. FE는 204 후 안내 → 세션 삭제 → 재로그인. 기존 비밀번호 불일치는 400 `INVALID_OLD_PASSWORD` | 추가 테이블 없음(보호 요청마다 하는 DB 재조회에 포함). 로그아웃 `jti` 폐기(DEC-001)와 별개 |
+| DEC-012 | Accepted | `ApiError.code` 표준값: `UNAUTHORIZED`(401), `FORBIDDEN`(403), `INVALID_CREDENTIALS`(401, 로그인 실패는 원인 구분 없이 단일 코드·문구 — 계정 상태 노출 방지), `INVALID_OLD_PASSWORD`(400), `PASSWORD_POLICY_VIOLATION`(400), `VALIDATION_FAILED`(400). 로그인 입력 누락도 `INVALID_CREDENTIALS` 401 | `openapi.yaml` `ApiError.code` 설명. FE는 `code`로 문구 매핑. 타 도메인 코드 추가는 별도 PR |
+| DEC-013 | Accepted | 비밀번호 변경 성공 시 **해당 사용자의 기존 Access Token 전체 무효화**(변경 요청 토큰 포함): Backend는 JWT `iat` < `password_updated_at`(초 단위 내림)이면 401. FE는 204 후 안내 → 세션 삭제 → 재로그인. 기존 비밀번호 불일치는 400 `INVALID_OLD_PASSWORD` | 추가 테이블 없음(보호 요청마다 하는 DB 재조회에 포함). 로그아웃 `jti` 폐기(DEC-001)와 별개 |
 
 ## 우선순위와 구현 전제
 
