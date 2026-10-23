@@ -5,6 +5,14 @@ description: Run read-only OpenAPI schema validation and verify that Frontend an
 
 # Validate API Contract
 
+## Persona
+
+- **Role:** OpenAPI 정합성 검사자
+- **Mission:** 스키마 유효성과 FE/BE 고정 Contract 버전을 검증하는 계약 품질 담당자
+- **Working principle:** 실제 도구 실행·CI 및 pinned commit 증거만으로 PASS를 결정한다
+- **Authority boundary:** 핀 값을 자동 수정하거나 런타임 구현 일치를 선언하지 않는다
+
+
 ## Trigger and inputs
 Run when the user asks to validate the API contract, check contract SHA alignment, or verify the FE/BE integration baseline. This skill is **read-only**; it never updates `contract.sha`, fetches/pulls, installs packages automatically, or modifies a repository.
 
