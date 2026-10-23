@@ -5,7 +5,7 @@
 | Requirement | 화면 (UI ID) | 외부 API (openapi.yaml 기준) | 데이터 Owner | 테스트 계획 ID |
 |---|---|---|---|---|
 | REQ-AUTH-001 | UI-AUTH-001 | POST /auth/login | AUTH_CREDENTIAL(Auth), USER(User) 참조 | TC-AUTH-001 |
-| REQ-AUTH-002 | UI-AUTH-001 내 로그아웃 동작 | POST /auth/logout | Auth | TC-AUTH-002 |
+| REQ-AUTH-002 | 공통 헤더 로그아웃 — 보호 화면 공통(예: UI-USER-002, UI-AUTH-002) | POST /auth/logout | Auth | TC-AUTH-002 |
 | REQ-AUTH-003 | UI-AUTH-002 | POST /auth/password/change | AUTH_CREDENTIAL(Auth) | TC-AUTH-003 |
 | REQ-USER-001 | UI-USER-001 | POST /users/signup | USER(User), AUTH_CREDENTIAL(Auth), USER_ROLE(Permission) | TC-USER-001 |
 | REQ-USER-002 | UI-USER-002 | GET/PATCH /users/me | USER(User) | TC-USER-002 |
