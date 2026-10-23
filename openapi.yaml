@@ -96,6 +96,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     patch:
       tags: [User]
       summary: 내 정보 수정
@@ -113,6 +115,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /admin/users:
     get:
       tags: [User]
@@ -138,6 +146,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
     post:
@@ -157,8 +167,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /admin/users/{id}:
     parameters:
       - $ref: '#/components/parameters/UserId'
@@ -173,6 +189,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -194,8 +212,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /admin/users/{id}/status:
     parameters:
       - $ref: '#/components/parameters/UserId'
@@ -211,13 +237,21 @@ paths:
               $ref: '#/components/schemas/StatusRequest'
       responses:
         '200':
-          description: 변경 성공
+          description: 변경 성공 (현재와 같은 상태로의 요청도 200, 변경 없음)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
   /admin/roles:
     get:
       tags: [Permission]
@@ -288,7 +322,7 @@ components:
         application/json:
           schema: { $ref: '#/components/schemas/ApiError' }
     Conflict:
-      description: 중복 사용자
+      description: 중복 또는 현재 상태와 충돌 (DUPLICATE_LOGIN_ID, DUPLICATE_EMAIL, INVALID_STATUS_TRANSITION)
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ApiError' }
@@ -322,6 +356,10 @@ components:
             UNAUTHORIZED(401, 토큰 없음/무효/만료/폐기), FORBIDDEN(403),
             INVALID_CREDENTIALS(401, 로그인 실패 — 자격증명 오류·비활성 계정·입력 누락을 구분하지 않음),
             INVALID_OLD_PASSWORD(400), PASSWORD_POLICY_VIOLATION(400), VALIDATION_FAILED(400, 그 외 요청 형식 오류).
+            User 사용 값(DEC-014):
+            DUPLICATE_LOGIN_ID(409), DUPLICATE_EMAIL(409), USER_NOT_FOUND(404),
+            INVALID_STATUS_TRANSITION(409, WITHDRAWN 사용자의 상태 변경).
+            User 입력 형식 오류는 VALIDATION_FAILED(400), 비밀번호 정책 위반은 PASSWORD_POLICY_VIOLATION(400)을 재사용합니다.
             다른 도메인 코드 추가를 막지 않도록 enum으로 제한하지 않습니다.
         message: { type: string }
     LoginRequest:
@@ -350,19 +388,21 @@ components:
       type: object
       required: [loginId, password, email, name]
       properties:
-        loginId: { type: string }
+        loginId: { type: string, minLength: 1, maxLength: 80 }
         password:
           type: string
           format: password
           minLength: 12
           description: DEC-007 — 12글자 이상, UTF-8 72바이트 이하. 위반 시 400 PASSWORD_POLICY_VIOLATION
-        email: { type: string, format: email }
-        name: { type: string }
+        email: { type: string, format: email, maxLength: 254 }
+        name: { type: string, minLength: 1, maxLength: 120 }
     UserUpdateRequest:
       type: object
+      description: 보낸 필드만 변경합니다. 빈 객체는 400 VALIDATION_FAILED (DEC-014)
+      minProperties: 1
       properties:
-        name: { type: string }
-        email: { type: string, format: email }
+        name: { type: string, minLength: 1, maxLength: 120 }
+        email: { type: string, format: email, maxLength: 254 }
     StatusRequest:
       type: object
       required: [status]
