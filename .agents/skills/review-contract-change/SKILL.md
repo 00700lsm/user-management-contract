@@ -30,6 +30,15 @@ Run when the user requests a contract change review, breaking-change assessment,
 5. Map changes through traceability REQ → UI → API → DB owner → TC; list A(Auth)/B(User)/C(Permission) affected FE and BE work. Inspect actual files/PRs if available; otherwise mark developer impact as `needs confirmation`.
 6. Identify prerequisite AA decision changes, Contract PR reviewers, API pin update work and G2/G3/G4 test scenarios. Never modify, approve or merge the PR as part of this review.
 
+
+## 개발 기능 PR의 최신 Contract/dev 영향 검토
+
+사용자가 Backend/Frontend 기능 PR 리뷰를 요청하면, 비교 기준을 **PR의 pinned Contract SHA → 리뷰 당시 Contract/dev HEAD SHA**로 명시하고 읽기 전용으로 비교합니다. 먼저 최신 dev HEAD를 조회하되 브랜치를 자동으로 전환하거나 Pull하지 않습니다. 현재 dev SHA를 기록하고 두 버전 간 수정된 operation/상태코드/요청·응답·권한을 검사합니다. 영향받는 A/B/C 담당자에게 변경을 전달하고 실제 구현·계약 테스트가 확인되지 않았으면 `NEEDS_REVIEW`로 표시합니다. SHA가 다르다는 이유만으로 BREAKING이라고 단정하지 않습니다.
+
+- 기존 기능 PR은 새 CI 시행에 따라 소급 차단하지 않습니다. 변경이 무관하면 개발을 계속하고, 관련된 변경은 원래 PR 브랜치에 수정 커밋을 추가하도록 제안합니다.
+- 리뷰 이후 Contract/dev가 변경될 수 있으므로 병합 직전에 최신 SHA와 검토 SHA가 같은지 다시 확인합니다. 다르면 변경된 범위를 재검토합니다.
+- CI의 drift WARNING은 호환성 PASS 증거가 아닙니다. 필수 pinned OpenAPI/통합 테스트 및 실제 FE/BE 검증 근거를 별도로 기록합니다.
+
 ## Output contract
 ```text
 변경 기준: BASE -> TARGET (commit SHAs)
