@@ -61,6 +61,17 @@ user-management-workspace/
 - 관련 기능 PR은 각 Repo에서 독립 Merge되므로 일시적 불일치가 생길 수 있습니다. 통합 배포/테스트 시 **호환되는 FE Commit + BE Commit + Contract SHA 세트**를 함께 기록해야 합니다.
 - Breaking Change라면 호환성 전략(병행 지원/동시 릴리스 등)을 승인 후 실행합니다. GitHub 저장소 세 개의 Merge는 원자적 작업이 아닙니다.
 
+
+## 진행 중 Contract 변경과 기능 PR의 호환성 검토 (단계적 적용)
+
+- Contract PR이 변경되면 AA는 변경된 path/method, 요청·응답·오류/상태코드·권한을 분류하고 REQ/UI/API/TC 및 Auth(A)·User(B)·Permission(C) 담당자를 식별해 PR 또는 Issue 링크로 통보합니다. 영향이 없는 담당자는 기존 작업을 지속합니다.
+- 구현 담당자는 기능 브랜치의 `contract.sha`를 개발 기준선으로 유지할 수 있습니다. 계약이 변경됐다는 이유만으로 다른 담당자의 작업을 중단하거나 모든 브랜치에 일괄 SHA 변경을 강요하지 않습니다.
+- **기능 PR → dev 병합 직전** AA는 구현 PR의 pin과 최신 **Contract/dev** 커밋 SHA를 함께 기록하고, 변경된 API의 호환성과 실제 테스트 결과를 검토합니다. 다른 SHA는 자동 실패가 아니라 영향 분석 대상입니다.
+- 계약과 기능 간 불일치가 발견되면 동일한 기존 PR 브랜치에 수정 커밋·테스트를 추가합니다. 새 PR을 강제로 만들거나 진행 중인 작업 브랜치를 자동 변경하지 않습니다.
+- Breaking Change 후보는 AA/PL과 영향받는 FE/BE 담당자가 대응 전략을 합의하기 전 병합하지 않습니다. OpenAPI diff·SHA 차이만으로 실제 런타임 호환성을 보장할 수 없습니다.
+- Backend·Frontend CI의 **최신 Contract/dev drift 확인은 초기에는 비차단 WARNING**으로 운영합니다. 기존 pinned OpenAPI/빌드 검증은 계속 필수입니다. 충분한 사례 검증 및 팀 합의 뒤에만 필수 호환성 게이트로 승격합니다.
+- 새 절차 시행 전에 생성된 PR은 소급 차단하지 않고 기존 검증 절차로 마무리합니다. Contract/dev가 리뷰 후 변경되었다면 병합 전 현재 SHA로 영향 범위를 재확인합니다.
+- **주의:** 개별 기능 PR의 호환성 검토와 FE+BE+Contract의 엄격한 통합 기준선(G0)은 다릅니다. G0에서 요구하는 동일 SHA 조건을 경고 검증으로 대체하지 않습니다.
 ## GitHub main/dev 보호 정책 (P0-03 승인안)
 
 Contract/Backend/Frontend/Workspace 4개 저장소의 main 및 dev 브랜치에 다음 보호 정책을 적용합니다.
