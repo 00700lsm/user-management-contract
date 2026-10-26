@@ -1,6 +1,6 @@
 # 요구사항 기준선 (PoC)
 
-상태: 기능 범위는 PoC 설계 기준이며 DEC-001~012는 [Accepted](./aa/decisions.md)이고 DEC-013은 Proposed(AA/PL 재검토 대기)입니다. 실제 구현과 테스트 완료 여부는 별개입니다.
+상태: 기능 범위는 PoC 설계 기준이며 DEC-001~012는 [Accepted](./aa/decisions.md)이고 DEC-013은 Proposed(AA/PL 재검토 대기), DEC-014는 Proposed(Contract PR #22 검토 중)입니다. 실제 구현과 테스트 완료 여부는 별개입니다.
 
 | ID | 도메인 | 기능 / 완료 조건 |
 |---|---|---|
