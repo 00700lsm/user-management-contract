@@ -1,6 +1,6 @@
 # AA 설계 결정 기록 — PoC 기준선
 
-**상태: DEC-001~011은 2026-10-20 PoC 진행 기준으로 Accepted**(사용자 승인에 따라 추천안으로 확정). **DEC-012는 2026-10-25 AA/PL 리뷰(Contract PR #23)에서 이견 없음 확인 후 Accepted. DEC-013은 판정 규칙 보완 후 AA/PL 재검토 대기(Proposed).** **문서 승인 ≠ 기능 구현·실제 테스트 완료**입니다. 상용 서비스/실제 개인정보 운영에는 별도 보안·법무 검토가 필요합니다.
+**상태: DEC-001~011은 2026-10-20 PoC 진행 기준으로 Accepted**(사용자 승인에 따라 추천안으로 확정). **DEC-012는 2026-10-25 AA/PL 리뷰(Contract PR #23)에서 이견 없음 확인 후 Accepted. DEC-013은 2026-10-26 AA/PL 승인(Contract PR #23, Backend PR #14 — pwv 정확 일치 판정과 회귀 테스트 확인) 후 Accepted.** **문서 승인 ≠ 기능 구현·실제 테스트 완료**입니다. 상용 서비스/실제 개인정보 운영에는 별도 보안·법무 검토가 필요합니다.
 
 | ID | 상태 | 확정한 PoC 기준 | 확인·검증/영향 |
 |---|---|---|---|
@@ -16,7 +16,7 @@
 | DEC-010 | Accepted | FE Mock Auth Adapter + MSW는 **development/test 전용**. BE Auth Fixture/격리 H2는 test Profile에만. CI/E2E의 실제 Auth 검증 필수; 운영에는 Mock/고정 테스트 비밀값/인증 우회 없음 | G1~G4 단계별 테스트 증거 |
 | DEC-011 | Accepted | 개발자별 **H2 Embedded File** 로컬 DB, 테스트별 H2 Memory DB; **Flyway SQL로 Schema/공통 테스트 Seed 재현**; 실제 DB 파일 Git 제외. PostgreSQL/공유 DB는 PoC 필수 아님 | schema migration·개발 프로필·CI 검증 |
 | DEC-012 | Accepted | `ApiError.code` 표준값: `UNAUTHORIZED`(401), `FORBIDDEN`(403), `INVALID_CREDENTIALS`(401, 로그인 실패는 원인 구분 없이 단일 코드·문구 — 계정 상태 노출 방지), `INVALID_OLD_PASSWORD`(400), `PASSWORD_POLICY_VIOLATION`(400), `VALIDATION_FAILED`(400), `NOT_FOUND`(404, 매핑되지 않은 경로 등 공통 미발견 — 도메인별 대상 미발견은 각 DEC의 세부 코드 사용, 예: DEC-014 `USER_NOT_FOUND`). 로그인 입력 누락도 `INVALID_CREDENTIALS` 401 | `openapi.yaml` `ApiError.code` 설명. FE는 `code`로 문구 매핑. 타 도메인 코드 추가는 별도 PR |
-| DEC-013 | Proposed | 비밀번호 변경 성공 시 **해당 사용자의 기존 Access Token 전체 무효화**(변경 요청 토큰 포함). 판정: 로그인 시 그 시점의 `auth_credential.password_updated_at`(epoch **밀리초**)을 JWT claim `pwv`로 발급하고, 보호 요청마다 `pwv`가 DB 현재값과 **정확히 일치**할 때만 허용(누락·불일치 401). 발급 시각(`iat`) 비교는 사용하지 않음 — 변경 시각과 같은 초에 발급된 기존 토큰도 거부되고, 변경 후 재로그인 토큰은 즉시 허용. FE는 204 후 안내 → 세션 삭제 → 재로그인. 기존 비밀번호 불일치는 400 `INVALID_OLD_PASSWORD` | 추가 테이블·스키마 변경 없음(기존 컬럼을 자격증명 버전으로 사용, 보호 요청마다 하는 DB 재조회에 포함). 로그아웃 `jti` 폐기(DEC-001)와 별개. **검증 계획**: ① 로그인 직후 대기 없이 비밀번호 변경 → 변경에 쓴 토큰 401 ② 변경 전 다른 로그인 토큰 401 ③ 변경 직후 같은 초 재로그인 토큰 허용 ④ `pwv` 누락·변조 토큰 401. 최초 구현(Backend #8)의 초 단위 `iat` 비교 결함은 별도 Backend 수정 PR로 교정 |
+| DEC-013 | Accepted | 비밀번호 변경 성공 시 **해당 사용자의 기존 Access Token 전체 무효화**(변경 요청 토큰 포함). 판정: 로그인 시 그 시점의 `auth_credential.password_updated_at`(epoch **밀리초**)을 JWT claim `pwv`로 발급하고, 보호 요청마다 `pwv`가 DB 현재값과 **정확히 일치**할 때만 허용(누락·불일치 401). 발급 시각(`iat`) 비교는 사용하지 않음 — 변경 시각과 같은 초에 발급된 기존 토큰도 거부되고, 변경 후 재로그인 토큰은 즉시 허용. FE는 204 후 안내 → 세션 삭제 → 재로그인. 기존 비밀번호 불일치는 400 `INVALID_OLD_PASSWORD` | 추가 테이블·스키마 변경 없음(기존 컬럼을 자격증명 버전으로 사용, 보호 요청마다 하는 DB 재조회에 포함). 로그아웃 `jti` 폐기(DEC-001)와 별개. **검증 계획**: ① 로그인 직후 대기 없이 비밀번호 변경 → 변경에 쓴 토큰 401 ② 변경 전 다른 로그인 토큰 401 ③ 변경 직후 같은 초 재로그인 토큰 허용 ④ `pwv` 누락·변조 토큰 401. 최초 구현(Backend #8)의 초 단위 `iat` 비교 결함은 Backend #14로 교정 |
 
 ## 우선순위와 구현 전제
 
