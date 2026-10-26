@@ -322,6 +322,7 @@ components:
             UNAUTHORIZED(401, 토큰 없음/무효/만료/폐기), FORBIDDEN(403),
             INVALID_CREDENTIALS(401, 로그인 실패 — 자격증명 오류·비활성 계정·입력 누락을 구분하지 않음),
             INVALID_OLD_PASSWORD(400), PASSWORD_POLICY_VIOLATION(400), VALIDATION_FAILED(400, 그 외 요청 형식 오류).
+            공통: NOT_FOUND(404, 매핑되지 않은 경로 등 — 도메인별 대상 미발견은 각 도메인 코드 사용).
             다른 도메인 코드 추가를 막지 않도록 enum으로 제한하지 않습니다.
         message: { type: string }
     LoginRequest:
