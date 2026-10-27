@@ -1,6 +1,6 @@
 # 요구사항 기준선 (PoC)
 
-상태: 기능 범위는 PoC 설계 기준이며 DEC-001~012는 [Accepted](./aa/decisions.md)이고 DEC-013은 Proposed(AA/PL 재검토 대기), DEC-014는 Proposed(Contract PR #22 검토 중)입니다. 실제 구현과 테스트 완료 여부는 별개입니다.
+상태: 기능 범위는 PoC 설계 기준이며 DEC-001~013은 [Accepted](./aa/decisions.md)이고 DEC-014는 Proposed(Contract PR #22 검토 중)입니다. 실제 구현과 테스트 완료 여부는 별개입니다.
 
 | ID | 도메인 | 기능 / 완료 조건 |
 |---|---|---|
@@ -28,7 +28,7 @@
 - 단일 Spring Boot 실행 앱 및 로컬 H2/Flyway: DEC-003/011.
 - 비밀번호 최소 12글자·UTF-8 최대 72바이트 및 BCrypt: DEC-007. 관리자 등록 시 명시적인 초기 비밀번호: DEC-006.
 - ACTIVE 사용자만 접근 가능하며 WITHDRAWN 복구는 PoC에서 제외: DEC-005.
-- 표준 `ApiError.code`(로그인 실패는 원인 구분 없이 `INVALID_CREDENTIALS`): DEC-012. 비밀번호 변경 시 기존 토큰 전체 무효화: DEC-013(Proposed).
+- 표준 `ApiError.code`(로그인 실패는 원인 구분 없이 `INVALID_CREDENTIALS`): DEC-012. 비밀번호 변경 시 기존 토큰 전체 무효화: DEC-013.
 - 별도 계정 잠금 정책·셀프 탈퇴 API·실제 개인정보 보존/파기 정책은 **PoC에 정의되지 않았습니다**. 필요한 경우 별도 요구와 Contract PR을 통해 합의합니다.
 
 주의: Accepted 정책이 `openapi.yaml`의 세부 Schema 검증 항목에 아직 모두 인코딩됐다는 뜻은 아닙니다. 실제 계약 변경은 선행 Contract PR에서 승인해야 합니다.
